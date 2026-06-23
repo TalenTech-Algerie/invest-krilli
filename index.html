@@ -2,6 +2,23 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8" />
+  <!-- Meta Pixel Code -->
+  <script>
+  !function(f,b,e,v,n,t,s)
+  {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+  n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+  if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+  n.queue=[];t=b.createElement(e);t.async=!0;
+  t.src=v;s=b.getElementsByTagName(e)[0];
+  s.parentNode.insertBefore(t,s)}(window, document,'script',
+  'https://connect.facebook.net/en_US/fbevents.js');
+  fbq('init', '1282555597294162');
+  fbq('track', 'PageView');
+  </script>
+  <noscript><img height="1" width="1" style="display:none"
+  src="https://www.facebook.com/tr?id=1282555597294162&ev=PageView&noscript=1"
+  /></noscript>
+  <!-- End Meta Pixel Code -->
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Krilli × Yinvesti Levée de Fonds</title>
   <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@300;400;500;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet" />
@@ -902,6 +919,26 @@
       : 'Krilli × Yinvesti — Levée de Fonds';
   }
 
+  // ── META PIXEL: ViewContent (engagement tracking) ────────────────
+  // Fires once when user scrolls 50%+ of the page OR stays 15+ seconds
+  let viewContentTriggered = false;
+  function fireViewContent() {
+    if (!viewContentTriggered && typeof fbq === 'function') {
+      fbq('track', 'ViewContent', { content_name: 'Krili Landing Page Engagement' });
+      viewContentTriggered = true;
+    }
+  }
+  // Scroll trigger
+  window.addEventListener('scroll', function() {
+    if (!viewContentTriggered) {
+      const scrollPercent = (window.scrollY + window.innerHeight) /
+        document.documentElement.scrollHeight * 100;
+      if (scrollPercent >= 50) fireViewContent();
+    }
+  });
+  // Time trigger (15 seconds)
+  setTimeout(fireViewContent, 15000);
+
   // ── SCROLL REVEAL ────────────────────────────────────────────────
   const reveals = document.querySelectorAll('.reveal');
   const observer = new IntersectionObserver((entries) => {
@@ -948,6 +985,19 @@
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ prenom, nom, email, phone, ville, profil, message, lang: currentLang })
       });
+
+      // Meta Pixel: Lead event — fired right after the submission to the
+      // backend succeeds, since this form shows an inline success message
+      // instead of redirecting to a confirmation page.
+      if (typeof fbq === 'function') {
+        fbq('track', 'Lead', {
+          content_name: 'Krili Investor Prospect',
+          content_category: 'Investment',
+          value: 0.00,
+          currency: 'DZD'
+        });
+      }
+
       document.getElementById('form-content').style.display = 'none';
       document.getElementById('success-msg').style.display = 'block';
     } catch (err) {
